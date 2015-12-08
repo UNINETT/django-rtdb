@@ -69,7 +69,8 @@ class AbstractObjectcustomfieldvalues(models.Model):
     'objectid' is the id of the row
     'objecttype' is the table"""
 
-    objectid = models.IntegerField()
+    # Rename this in view tables
+    # objectid = models.IntegerField()
     customfield = models.ForeignKey('Customfield', db_column='customfield')
     content = models.CharField(max_length=255, blank=True, null=True)
     creator = models.IntegerField()
