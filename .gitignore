@@ -1,0 +1,11 @@
+*.pyc
+*.pyo
+*.swp
+*~
+*.egg-info
+.coverage
+htmlcov
+src/static_root
+src/static
+build
+dist
