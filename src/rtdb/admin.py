@@ -6,7 +6,6 @@ from .models import (
     Objectcustomfieldvalues,
     Queue,
     TicketCustomfieldValue,
-    TicketCustomfieldValueManager,
     Ticket,
 )
 
