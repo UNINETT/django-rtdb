@@ -7,7 +7,7 @@ with open('README.rst') as README_FILE:
 
 setup(
     name='django-rtdb',
-    version='0.2.1',
+    version='1.0.0',
     packages=['rtdb'],
     package_dir = {'': 'src',},
     include_package_data=True,
