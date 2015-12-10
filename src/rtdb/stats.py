@@ -45,5 +45,6 @@ def get_stats_for_customfield(customfields=None):
         count = stat['count']
         contents = stats.get(customfield, {})
         contents[status] = count
+        contents['content'] = content
         stats[customfield] = contents
     return stats
