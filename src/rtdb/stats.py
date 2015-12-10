@@ -1,3 +1,5 @@
+"""Functions to extract statistics from tickets"""
+
 from __future__ import unicode_literals
 
 from django.db.models import Count
@@ -6,14 +8,17 @@ from .models import Ticket, Queue, TicketCustomfieldValue
 
 
 def get_statuses():
+    "Get a list of statuses in use, with no repetitions"
     return Ticket.objects.values_list('status', flat=True).distinct()
 
 
 def get_queues():
+    "Get a list of all queues"
     return Queue.objects.all()
 
 
 def get_stats_for_queue(queues=None):
+    "Get how many of each status each queue has"
     all_queues = get_queues().values_list('name', flat=True)
     qs = Ticket.objects
     if queues:
@@ -33,6 +38,7 @@ def get_stats_for_queue(queues=None):
 
 
 def get_stats_for_customfield(customfields=None):
+    "Get how many of each status each customfield+content has"
     qs = TicketCustomfieldValue.objects
     if customfields:
         qs = qs.filter(customfield__name__in=customfields)
