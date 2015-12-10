@@ -38,92 +38,6 @@ class Customfield(models.Model):
 
 
 @python_2_unicode_compatible
-class CustomfieldValue(models.Model):
-    "Allowable content for Customfields"
-
-    customfield = models.ForeignKey('Customfield', db_column='customfield')
-    name = models.CharField(max_length=200, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    sortorder = models.IntegerField()
-    creator = models.IntegerField()
-    created = models.DateTimeField(blank=True, null=True)
-    lastupdatedby = models.IntegerField()
-    lastupdated = models.DateTimeField(blank=True, null=True)
-    category = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'customfieldvalues'
-
-    def __str__(self):
-        return '{}: {}'.format(self.customfield, self.name)
-
-
-class AbstractObjectcustomfieldvalues(models.Model):
-    """This table points to several other tables
-
-    Known hooks:
-    * Tickets
-    * Articles
-
-    'objectid' is the id of the row
-    'objecttype' is the table"""
-
-    # Rename this in view tables
-    # objectid = models.IntegerField()
-    customfield = models.ForeignKey('Customfield', db_column='customfield')
-    content = models.CharField(max_length=255, blank=True, null=True)
-    creator = models.IntegerField()
-    created = models.DateTimeField(blank=True, null=True)
-    lastupdatedby = models.IntegerField()
-    lastupdated = models.DateTimeField(blank=True, null=True)
-    objecttype = models.CharField(max_length=255)
-    largecontent = models.TextField(blank=True, null=True)
-    contenttype = models.CharField(max_length=80, blank=True, null=True)
-    contentencoding = models.CharField(max_length=80, blank=True, null=True)
-    sortorder = models.IntegerField()
-    disabled = models.IntegerField()
-
-    class Meta:
-        managed = False
-        abstract = True
-        db_table = 'objectcustomfieldvalues'
-
-
-class Objectcustomfieldvalues(AbstractObjectcustomfieldvalues):
-    "All Objectcustomfieldvalues"
-
-    class Meta:
-        managed = False
-        db_table = 'objectcustomfieldvalues'
-
-
-class TicketCustomfieldValueManager(models.Manager):
-    "Filter out non-Tickets"
-
-    def get_queryset(self):
-        return super(TicketCustomfieldValueManager,
-            self).get_queryset().filter(objecttype='RT::Ticket')
-
-
-@python_2_unicode_compatible
-class TicketCustomfieldValue(AbstractObjectcustomfieldvalues):
-    "Only Objectcustomfieldvalues for Ticket"
-
-    # Easier joins: add a name to the column
-    ticket = models.ForeignKey('Ticket', db_column='objectid', related_name='customfields')
-
-    objects = TicketCustomfieldValueManager()
-
-    class Meta:
-        managed = False
-        db_table = 'objectcustomfieldvalues'
-
-    def __str__(self):
-        return '{}: {}'.format(self.customfield, self.content)
-
-
-@python_2_unicode_compatible
 class Queue(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=255, blank=True, null=True)
@@ -182,3 +96,71 @@ class Ticket(models.Model):
 
     def __str__(self):
         return '#{}: {}'.format(self.id, self.subject)
+
+
+class TicketCustomfieldValueManager(models.Manager):
+    "Filter out non-Tickets"
+
+    def get_queryset(self):
+        return super(TicketCustomfieldValueManager,
+            self).get_queryset().filter(objecttype='RT::Ticket')
+
+
+@python_2_unicode_compatible
+class TicketCustomfieldValue(models.Model):
+    """The "objectcustomfieldvalues" table points to several other tables
+
+    This model is only for "tickets" objectcustomfieldvalues
+
+    Known hooks:
+    * Tickets
+    * Articles
+
+    'objectid' is the id of the row
+    'objecttype' is the table"""
+
+    # Rename the column
+    ticket = models.ForeignKey('Ticket', db_column='objectid', related_name='customfields')
+    customfield = models.ForeignKey('Customfield', db_column='customfield')
+    content = models.CharField(max_length=255, blank=True, null=True)
+    creator = models.IntegerField()
+    created = models.DateTimeField(blank=True, null=True)
+    lastupdatedby = models.IntegerField()
+    lastupdated = models.DateTimeField(blank=True, null=True)
+    objecttype = models.CharField(max_length=255)
+    largecontent = models.TextField(blank=True, null=True)
+    contenttype = models.CharField(max_length=80, blank=True, null=True)
+    contentencoding = models.CharField(max_length=80, blank=True, null=True)
+    sortorder = models.IntegerField()
+    disabled = models.IntegerField()
+
+    objects = TicketCustomfieldValueManager()
+
+    class Meta:
+        managed = False
+        db_table = 'objectcustomfieldvalues'
+
+    def __str__(self):
+        return '{}: {}'.format(self.customfield, self.content)
+
+
+@python_2_unicode_compatible
+class CustomfieldValue(models.Model):
+    "Allowable content for Customfields"
+
+    customfield = models.ForeignKey('Customfield', db_column='customfield')
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    sortorder = models.IntegerField()
+    creator = models.IntegerField()
+    created = models.DateTimeField(blank=True, null=True)
+    lastupdatedby = models.IntegerField()
+    lastupdated = models.DateTimeField(blank=True, null=True)
+    category = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'customfieldvalues'
+
+    def __str__(self):
+        return '{}: {}'.format(self.customfield, self.name)
