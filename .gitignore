@@ -4,6 +4,7 @@
 *~
 *.egg-info
 .coverage
+.tox
 htmlcov
 src/static_root
 src/static
