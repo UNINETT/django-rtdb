@@ -36,13 +36,14 @@ def get_stats_for_customfield(customfields=None):
     qs = TicketCustomfieldValue.objects
     if customfields:
         qs = qs.filter(customfield__name__in=customfields)
-    result = qs.values('customfield__name', 'content').annotate(count=Count('ticket__status'))
+    result = qs.values('customfield__name', 'content', 'ticket__status').annotate(count=Count('ticket__status'))
     stats = {}
     for stat in result:
         customfield = stat['customfield__name']
         content = stat['content']
+        status = stat['ticket__status']
         count = stat['count']
-        contents = stats.get(queue, {})
+        contents = stats.get(customfield, {})
         contents[status] = count
-        stats[queue] = contents
+        stats[customfield] = contents
     return stats
