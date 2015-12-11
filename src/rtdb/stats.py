@@ -49,8 +49,10 @@ def get_stats_for_customfield(customfields=None):
         content = stat['content']
         status = stat['ticket__status']
         count = stat['count']
-        contents = stats.get(customfield, {})
-        contents[status] = count
-        contents['content'] = content
-        stats[customfield] = contents
+
+        data = stats.get(customfield, {})
+        cfv = data.get(content, {})
+        cfv[status] = count
+        data[content] = cfv
+        stats[customfield] = data
     return stats

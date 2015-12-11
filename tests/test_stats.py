@@ -78,33 +78,34 @@ class StatsForQueueTestCase(TestCase):
         self.assertEqual(stats['gamma'], Counter(self.gamma_queue_statuses))
 
 class StatsForCustomFieldsTestCase(TestCase):
-    queues = ['alpha', 'beta', 'gamma']
-    customfields = ['winter', 'spring', 'summer', 'fall']
+    customfields = ['alpha', 'omega']
+    statuses = ('new', 'open', 'closed')
 
     def setUp(self):
-        self.alpha_cf_statuses = STATUSES * 1
-        self.beta_cf_statuses = STATUSES * 2
-        self.gamma_cf_statuses = STATUSES * 3
+        queue = QueueFactory()
 
-        alpha = QueueFactory(name='alpha')
-        for s in self.alpha_cf_statuses:
-            ticket = TicketFactory(queue=alpha, status=s)
-            TicketCustomfieldValueFactory(ticket=ticket, customfield__name='winter')
-        beta = QueueFactory(name='beta')
-        for s in self.beta_cf_statuses:
-            ticket = TicketFactory(queue=beta, status=s)
-            TicketCustomfieldValueFactory(ticket=ticket, customfield__name='spring')
-            TicketCustomfieldValueFactory(ticket=ticket, customfield__name='winter')
-        gamma = QueueFactory(name='gamma')
-        for s in self.gamma_cf_statuses:
-            ticket = TicketFactory(queue=gamma, status=s)
-            TicketCustomfieldValueFactory(ticket=ticket, customfield__name='summer')
-            TicketCustomfieldValueFactory(ticket=ticket, customfield__name='fall')
+        self.alpha_cf = {
+                'thing1': ['new'],
+                'thing2': ['new', 'new', 'open'],
+                'thing3': ['closed', 'new', 'open'],
+        }
+        self.omega_cf = {
+                'thing4': ['open', 'open', 'open', 'open'],
+        }
+        for content, statuses in self.alpha_cf.items():
+            for s in statuses:
+                ticket = TicketFactory(queue=queue, status=s)
+                TicketCustomfieldValueFactory(ticket=ticket, customfield__name='alpha', content=content)
+        for content, statuses in self.omega_cf.items():
+            for s in statuses:
+                ticket = TicketFactory(queue=queue, status=s)
+                TicketCustomfieldValueFactory(ticket=ticket, customfield__name='omega', content=content)
 
     def test_get_stats_for_customfield(self):
         stats = get_stats_for_customfield()
         self.assertIsInstance(stats, dict)
         self.assertEqual(set(stats.keys()), set(self.customfields))
-        for cf, stat in stats.items():
-            del stat['content']
-            self.assertEqual(stat, Counter(STATUSES))
+        for content, data in stats['alpha'].items():
+            self.assertEqual(Counter(self.alpha_cf[content]), data)
+        for content, data in stats['omega'].items():
+            self.assertEqual(Counter(self.omega_cf[content]), data)
