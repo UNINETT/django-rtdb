@@ -14,8 +14,8 @@ class UnManagedModelTestRunner(DiscoverRunner):
     '''
 
     def setup_test_environment(self, *args, **kwargs):
-        from django.db.models.loading import get_models
-        self.unmanaged_models = [m for m in get_models()
+        from django.apps import apps
+        self.unmanaged_models = [m for m in apps.get_models()
                 if not m._meta.managed and m.__name__ not in VIRTUAL_TABLES]
         for m in self.unmanaged_models:
             m._meta.managed = True
